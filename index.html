@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>GanDollar</title>
+  
+  <style>
+    body {
+      background: white;
+      margin: 15px;
+    }
+    
+    .select {
+      margin-top: 50px;
+    }
+    
+    .conversion {
+      margin: 25px 0 25px 0;
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 10px;
+    }
+  </style>
+
+</head>
+<body>
+
+  <h2>GanDollar</h2>
+
+  <div class="select-currency select">
+      <select class="select-text">
+        <option disabled selected>Select Currency</option>
+        <option value="USD">US Dollars</option>
+        <option value="KES">Kenyan Shillings</option>
+        <option value="UGX">Ugandan Shillings</option>
+        <option value="GHS">Ghanian Cedi</option>
+      </select>
+    
+      <span class="select-highlight"></span>
+      <span class="select-bar"></span>
+      <label class="select-label">Currencies</label>
+  </div>
+  
+  <button class="btn">Convert</button>
+  
+  <div class="conversion mdc-elevation--z3 class">
+    
+  </div>
+
+  <script>
+
+      var currencies = ['USD', 'KES', 'GHS', 'UGX'];
+      var conversionAPI = from =>
+        `https://free.currencyconverterapi.com/api/v6/convert?q=${from}_NGN&compact=y`;
+
+      var displayConversion = conversion => {
+        const [entry] = Object.values(conversion);
+        const value = Number.parseFloat(entry.val).toFixed(2);
+        document.querySelector('.conversion').textContent = `${value} Naira`;
+
+        const btn = document.querySelector('.btn');
+        btn.removeAttribute('disabled');
+      };
+      
+      var getSelectedCurrency = () => {
+        const currency = document.querySelector('select.select-text').value;
+        if(!currencies.includes(currency)) return undefined;
+        
+        return currency;
+      };
+      
+      var convert = (event) => {
+        const currency = getSelectedCurrency();
+        
+        if(!currency) return;
+        
+        const btn = event.target;
+        btn.setAttribute('disabled', 'disabled');
+        
+        const url = conversionAPI(currency);
+        
+        fetch(url).then(response => response.json())
+        	.then(data => {
+          		displayConversion(data)
+        	})
+        	.catch(err => console.error(err.message));
+        
+      };
+      
+      var startApp = () => {
+        const btn = document.querySelector('button.btn');
+        if(!btn) return;
+        
+        btn.addEventListener('click', convert);
+      };
+
+      startApp();
+  </script>
+</body>
+</html>
